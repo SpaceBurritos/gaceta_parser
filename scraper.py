@@ -1,35 +1,27 @@
 import requests
 from bs4 import BeautifulSoup
-import PyPDF2
+from dataclasses import dataclass, field
 
+
+@dataclass()
 class Scraper:
+    parse: dict = field(default_factory=dict)
 
-    def __init__(self):
-        self.file = None
-
-    def downloadFile(self):
+    def get_text(self):
+        """ Gets the text and adds it into a dictionary dividing it between the sub-sections"""
         url = 'https://www.imprentanacional.go.cr/gaceta/'
-        base_url = "https://www.imprentanacional.go.cr"
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
-        file_url = base_url + soup.findAll(attrs={'class': 'LinkNavBar'})[2]["href"]
-        name = file_url.split("/")[-1]
-        with requests.get(file_url, stream=True) as r:
-            r.raise_for_status()
-            with open("pdfs/"+name, 'wb') as f:
-                for chunk in r.iter_content(chunk_size=8192):
+        para = soup.find(id="ctl00_MainContentPlaceHolder_ContenidoGacetaDiv")
 
-                    f.write(chunk)
-                self.file = f
-        return name
+        for p in para:
+            if p.name == "h1":
+                name = p.get_text()
+                print(name)
+            elif p.name == "div":
+                self.parse[name] = p.get_text()
 
-    def getPDF(self, filename):
-        file = open("pdfs/"+filename, 'rb')
-        return PyPDF2.PdfFileReader(file)
 
 if __name__ == "__main__":
     s = Scraper()
-    name2 = s.downloadFile()
-    pdf = s.getPDF(name2)
-    page_one = pdf.getPage(1)
-    print(page_one.extractText())
+    s.get_text()

@@ -41,11 +41,11 @@ class Scraper:
 
     def _parse_text(self, name: str, doc):
         if name == Sections.documentos_varios:
-            return self.get_industrial_requests(doc)
+            return self._parse_industrial_requests(doc)
         else:
             return doc
 
-    def get_industrial_requests(self, doc) -> [str]:
+    def _parse_industrial_requests(self, doc) -> [str]:
         """ Gets all the requests from the DOCUMENTSO VARIOS file """
         industrial_requests = []
         REGISTRO_PROPIEDAD_IND = "PROPIEDAD INDUSTRIAL"
@@ -64,12 +64,17 @@ class Scraper:
                 add_next_para = False
         return industrial_requests
 
-    def get_industrial_request(self, num: str) -> str:
-        for r in self.parsed_text[Sections.documentos_varios]:
-            if num in r:
-                return r
+    def get_industrial_requests(self, nums: [str]) -> [str]:
+        output = []
+        print(nums)
+        for num in nums:
+            for r in self.parsed_text[Sections.documentos_varios]:
+                if num in r:
+                    output.append(r)
+                    break
+        return output
 
 
 if __name__ == "__main__":
     s = Scraper()
-    print(s.get_industrial_request("2022-0002820"))
+    print(len(s.get_industrial_requests(["2022-0003586", "2022-0002820"])))

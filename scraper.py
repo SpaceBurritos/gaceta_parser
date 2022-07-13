@@ -6,6 +6,8 @@ from enum import Enum
 
 
 class Sections(str, Enum):
+    """ All the different sections from the Gaceta """
+
     portada = "PORTADA"
     poder_legislativo = "PODER LEGISLATIVO"
     poder_ejecutivo = "PODER EJECUTIVO"
@@ -34,8 +36,7 @@ class Scraper:
         name = ""
 
         # The text is divided between the titles - h1 and the main content - div
-        # Only the last part has two consecutive div, and that last div is just the
-        # bibliographic references, so it can be ignored
+        # The last div is just the web references, so it can be ignored
         for i, p in enumerate(para):
             if p.name == "h1":
                 name = p.get_text()
